@@ -5,6 +5,7 @@ from .views import (
     SignInView,
     SignOutView,
     UserProfileViewSet,
+    ProductViewSet,
     check_auth,
     verify_username,
     verify_email
@@ -12,6 +13,7 @@ from .views import (
 
 router = DefaultRouter()
 router.register(r'profile', UserProfileViewSet, basename='profile')
+router.register(r'products', ProductViewSet, basename='products')
 
 urlpatterns = [
     # Authentication endpoints
@@ -24,6 +26,6 @@ urlpatterns = [
     path('verify/username/', verify_username, name='verify_username'),
     path('verify/email/', verify_email, name='verify_email'),
     
-    # Profile endpoints
+    # Profile and Products endpoints
     path('', include(router.urls)),
 ]

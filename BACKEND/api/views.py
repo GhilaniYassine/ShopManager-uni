@@ -2,17 +2,18 @@ from rest_framework import status, generics, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
-from .models import UserProfile
+from .models import UserProfile, Product
 from .serializers import (
     SignUpSerializer, 
     SignInSerializer, 
     UserSerializer,
-    UserProfileSerializer
+    UserProfileSerializer,
+    ProductSerializer
 )
 
 
@@ -166,3 +167,21 @@ def verify_email(request):
         'success': True,
         'available': not exists
     }, status=status.HTTP_200_OK)
+
+
+class ProductViewSet(viewsets.ModelViewSet):
+    """ViewSet for product CRUD operations"""
+    serializer_class = ProductSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        """Return only products for the current user"""
+        return Product.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        """Create product for current user"""
+        serializer.save(user=self.request.user)
+    
+    def perform_update(self, serializer):
+        """Update product for current user"""
+        serializer.save(user=self.request.user)
